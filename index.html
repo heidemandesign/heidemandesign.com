@@ -47,7 +47,7 @@
             content: '';
             position: fixed;
             inset: 0;
-            background-image: radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
             background-size: 24px 24px;
             pointer-events: none;
             z-index: 0;
@@ -343,8 +343,9 @@
         .modal-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(10, 14, 20, 0.95);
-            backdrop-filter: blur(20px);
+            background: rgba(10, 14, 20, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             z-index: 200;
             opacity: 0;
             visibility: hidden;
@@ -521,295 +522,327 @@
             opacity: 0.7;
         }
 
-        /* Mockup containers */
-        .mockup-scene {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 10%;
-            position: relative;
-        }
+        /* ====== 3D DARK MOCKUPS ====== */
 
-        /* Laptop mockup */
+        /* Laptop/Monitor mockup */
         .mockup-laptop {
-            width: 85%;
-            max-width: 320px;
+            width: 70%;
+            max-width: 260px;
             position: relative;
+            filter: drop-shadow(0 30px 60px rgba(0,0,0,0.6));
         }
         .laptop-screen {
-            background: linear-gradient(145deg, #1a1a2e, #16213e);
-            border-radius: 8px 8px 0 0;
+            background: linear-gradient(145deg, #1c1c1c, #0a0a0a);
+            border-radius: 12px 12px 0 0;
             aspect-ratio: 16/10;
-            padding: 8%;
-            box-shadow: inset 0 0 30px rgba(0,0,0,0.5);
-            border: 2px solid #2a2a3a;
+            padding: 6%;
+            border: 3px solid #2a2a2a;
+            position: relative;
+        }
+        .laptop-screen::before {
+            content: '';
+            position: absolute;
+            top: 4%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 6px;
+            height: 6px;
+            background: #333;
+            border-radius: 50%;
         }
         .laptop-content {
             width: 100%;
             height: 100%;
-            background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
-            border-radius: 2px;
+            background: #0a0a0a;
+            border-radius: 4px;
             overflow: hidden;
             position: relative;
+            display: flex;
+            flex-direction: column;
+            padding: 12%;
+            gap: 8%;
         }
         .laptop-content::before {
             content: '';
-            position: absolute;
-            top: 8%;
-            left: 8%;
-            width: 50%;
-            height: 12%;
-            background: rgba(16,185,129,0.4);
-            border-radius: 4px;
+            width: 60%;
+            height: 8%;
+            background: #10b981;
+            border-radius: 2px;
+            box-shadow: 0 0 20px rgba(16,185,129,0.5);
         }
         .laptop-content::after {
             content: '';
-            position: absolute;
-            top: 28%;
-            left: 8%;
-            right: 35%;
-            height: 45%;
-            background: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%);
-            border-radius: 4px;
+            width: 80%;
+            height: 4%;
+            background: rgba(16,185,129,0.4);
+            border-radius: 2px;
         }
         .laptop-base {
-            background: linear-gradient(180deg, #3a3a4a, #2a2a3a);
-            height: 12px;
-            border-radius: 0 0 8px 8px;
-            margin: 0 -5%;
+            background: linear-gradient(180deg, #252525, #1a1a1a);
+            height: 14px;
+            border-radius: 0 0 4px 4px;
+            margin: 0 -8%;
+            position: relative;
+        }
+        .laptop-base::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20%;
+            height: 4px;
+            background: #333;
+            border-radius: 2px;
         }
 
         /* Business cards mockup */
         .mockup-cards {
             position: relative;
-            width: 80%;
-            height: 70%;
+            width: 75%;
+            height: 65%;
+            filter: drop-shadow(0 25px 50px rgba(0,0,0,0.5));
         }
         .card-back {
             position: absolute;
-            width: 70%;
-            aspect-ratio: 1.75;
-            background: linear-gradient(135deg, #1a1f28, #0d1117);
-            border-radius: 8px;
-            top: 10%;
-            left: 5%;
+            width: 75%;
+            aspect-ratio: 1.6;
+            background: linear-gradient(145deg, #1a1a1a, #0d0d0d);
+            border-radius: 10px;
+            top: 5%;
+            left: 0;
             transform: rotate(-8deg);
-            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
-            border: 1px solid rgba(255,255,255,0.05);
+            border: 1px solid #2a2a2a;
+        }
+        .card-back::before {
+            content: '';
+            position: absolute;
+            top: 20%;
+            left: 15%;
+            width: 35%;
+            height: 25%;
+            background: #10b981;
+            border-radius: 50%;
+            box-shadow: 0 0 30px rgba(16,185,129,0.4);
         }
         .card-front {
             position: absolute;
-            width: 70%;
-            aspect-ratio: 1.75;
-            background: linear-gradient(145deg, #fafafa, #e8e8e8);
-            border-radius: 8px;
-            top: 25%;
-            left: 25%;
+            width: 75%;
+            aspect-ratio: 1.6;
+            background: linear-gradient(145deg, #252525, #1a1a1a);
+            border-radius: 10px;
+            top: 30%;
+            left: 20%;
             transform: rotate(5deg);
-            box-shadow: 0 15px 50px rgba(0,0,0,0.5);
-            padding: 12%;
+            border: 1px solid #333;
+            overflow: hidden;
         }
         .card-front::before {
             content: '';
             position: absolute;
             top: 15%;
-            left: 12%;
-            width: 25%;
-            height: 20%;
+            left: 10%;
+            width: 30%;
+            height: 30%;
             background: linear-gradient(135deg, #10b981, #059669);
-            border-radius: 4px;
+            border-radius: 6px;
+            box-shadow: 0 0 25px rgba(16,185,129,0.3);
         }
         .card-front::after {
             content: '';
             position: absolute;
             bottom: 20%;
-            left: 12%;
-            right: 12%;
-            height: 30%;
-            background: linear-gradient(180deg, #333 0%, #333 33%, transparent 33%, transparent 50%, #666 50%, #666 66%, transparent 66%);
-            background-size: 100% 12px;
+            left: 10%;
+            width: 50%;
+            height: 3px;
+            background: #444;
+            border-radius: 2px;
+            box-shadow: 0 8px 0 #333, 0 16px 0 #2a2a2a;
         }
 
         /* Pitch deck mockup */
         .mockup-deck {
-            width: 85%;
-            max-width: 280px;
+            width: 80%;
+            max-width: 260px;
             position: relative;
+            filter: drop-shadow(0 25px 50px rgba(0,0,0,0.5));
         }
         .deck-slide {
-            background: linear-gradient(145deg, #1e1e2e, #12121a);
+            background: linear-gradient(145deg, #1a1a1a, #0d0d0d);
             aspect-ratio: 16/9;
-            border-radius: 8px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05);
-            padding: 10%;
+            border-radius: 10px;
+            border: 2px solid #2a2a2a;
+            padding: 8%;
             position: relative;
+            overflow: hidden;
         }
         .deck-slide::before {
             content: '$2.4M';
             position: absolute;
-            top: 15%;
-            left: 10%;
-            font-size: 24px;
+            top: 12%;
+            left: 8%;
+            font-size: clamp(16px, 3vw, 28px);
             font-weight: 700;
             color: #10b981;
             font-family: system-ui;
+            text-shadow: 0 0 20px rgba(16,185,129,0.5);
         }
         .deck-slide::after {
             content: '';
             position: absolute;
-            bottom: 15%;
-            right: 10%;
-            width: 35%;
-            height: 50%;
-            background: conic-gradient(#10b981 0% 65%, #6366f1 65% 85%, #f59e0b 85% 100%);
+            bottom: 12%;
+            right: 8%;
+            width: 40%;
+            height: 55%;
+            background: conic-gradient(from 0deg, #10b981 0% 65%, #1a1a1a 65% 100%);
             border-radius: 50%;
+            box-shadow: 0 0 30px rgba(16,185,129,0.3);
         }
         .deck-shadow {
-            position: absolute;
-            bottom: -8px;
-            left: 5%;
-            right: 5%;
-            height: 100%;
-            background: rgba(0,0,0,0.3);
-            border-radius: 8px;
-            z-index: -1;
-            filter: blur(4px);
+            display: none;
         }
 
-        /* Banner mockup */
+        /* Banner/Signage mockup */
         .mockup-banner {
-            width: 50%;
-            max-width: 140px;
+            width: 40%;
+            max-width: 100px;
+            filter: drop-shadow(0 20px 40px rgba(0,0,0,0.5));
         }
         .banner-stand {
             position: relative;
         }
         .banner-panel {
-            background: linear-gradient(180deg, #1a1a2e 0%, #0f0f1a 100%);
-            aspect-ratio: 1/2.5;
-            border-radius: 4px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            border: 1px solid rgba(255,255,255,0.05);
+            background: linear-gradient(180deg, #1a1a1a 0%, #0d0d0d 100%);
+            aspect-ratio: 1/2.2;
+            border-radius: 6px;
+            border: 2px solid #2a2a2a;
             position: relative;
             overflow: hidden;
         }
         .banner-panel::before {
             content: '';
             position: absolute;
-            top: 10%;
-            left: 15%;
-            right: 15%;
-            height: 15%;
-            background: linear-gradient(90deg, #a78bfa, #6366f1);
+            top: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50%;
+            height: 25%;
+            border: 3px solid #10b981;
             border-radius: 4px;
+            box-shadow: 0 0 20px rgba(16,185,129,0.4), inset 0 0 15px rgba(16,185,129,0.2);
         }
         .banner-panel::after {
-            content: '2024';
+            content: '';
             position: absolute;
-            bottom: 15%;
-            left: 0;
-            right: 0;
-            text-align: center;
-            font-size: 18px;
-            font-weight: 700;
-            color: rgba(255,255,255,0.3);
-            font-family: system-ui;
+            bottom: 20%;
+            left: 20%;
+            right: 20%;
+            height: 3px;
+            background: #333;
+            border-radius: 2px;
+            box-shadow: 0 10px 0 #2a2a2a, 0 20px 0 #222;
         }
         .banner-base {
-            width: 30%;
-            height: 8px;
-            background: #2a2a3a;
-            margin: 8px auto 0;
-            border-radius: 4px;
+            width: 50%;
+            height: 10px;
+            background: linear-gradient(180deg, #2a2a2a, #1a1a1a);
+            margin: 0 auto;
+            border-radius: 0 0 4px 4px;
         }
 
-        /* Brochure mockup */
+        /* Brochure/Marketing mockup */
         .mockup-brochure {
             position: relative;
-            width: 80%;
-            height: 80%;
+            width: 75%;
+            height: 75%;
+            filter: drop-shadow(0 20px 40px rgba(0,0,0,0.5));
         }
         .brochure-back {
             position: absolute;
             width: 55%;
-            aspect-ratio: 0.7;
-            background: linear-gradient(145deg, #f59e0b, #d97706);
-            border-radius: 4px;
-            top: 5%;
+            aspect-ratio: 0.75;
+            background: linear-gradient(145deg, #10b981, #059669);
+            border-radius: 6px;
+            top: 0;
             left: 0;
             transform: rotate(-12deg);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+            box-shadow: 0 0 30px rgba(16,185,129,0.3);
         }
         .brochure-front {
             position: absolute;
             width: 55%;
-            aspect-ratio: 0.7;
-            background: linear-gradient(180deg, #fafafa, #e5e5e5);
-            border-radius: 4px;
-            top: 10%;
+            aspect-ratio: 0.75;
+            background: linear-gradient(145deg, #1a1a1a, #0d0d0d);
+            border-radius: 6px;
+            top: 15%;
             left: 35%;
             transform: rotate(6deg);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            border: 1px solid #2a2a2a;
             overflow: hidden;
         }
         .brochure-front::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 40%;
-            background: linear-gradient(135deg, #10b981, #059669);
+            top: 10%;
+            left: 10%;
+            right: 10%;
+            height: 4px;
+            background: #10b981;
+            border-radius: 2px;
+            box-shadow: 0 12px 0 #333, 0 24px 0 #2a2a2a, 0 36px 0 #222;
         }
         .brochure-front::after {
             content: '';
             position: absolute;
             bottom: 15%;
             left: 10%;
-            right: 10%;
-            height: 25%;
-            background: repeating-linear-gradient(180deg, #999 0px, #999 2px, transparent 2px, transparent 8px);
+            width: 40%;
+            height: 20%;
+            background: rgba(16,185,129,0.3);
+            border-radius: 4px;
         }
 
-        /* Logo mockup */
+        /* Logo mockup - 3D cube */
         .mockup-logo {
-            width: 70%;
-            max-width: 200px;
+            width: 60%;
+            max-width: 140px;
             aspect-ratio: 1;
             display: flex;
             align-items: center;
             justify-content: center;
             position: relative;
+            filter: drop-shadow(0 25px 50px rgba(0,0,0,0.5));
         }
         .logo-mark {
-            width: 60%;
+            width: 80%;
             aspect-ratio: 1;
-            background: linear-gradient(135deg, #10b981, #059669);
-            border-radius: 24%;
-            box-shadow: 0 20px 60px rgba(16,185,129,0.3), 0 0 0 1px rgba(255,255,255,0.1);
+            background: linear-gradient(145deg, #1a1a1a, #0d0d0d);
+            border-radius: 20%;
+            border: 2px solid #2a2a2a;
             position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .logo-mark::before {
             content: '';
             position: absolute;
-            top: 20%;
-            left: 20%;
-            right: 20%;
-            bottom: 20%;
-            border: 4px solid rgba(255,255,255,0.9);
-            border-radius: 50%;
+            width: 50%;
+            height: 50%;
+            background: transparent;
+            border: 3px solid #10b981;
+            border-radius: 8px;
+            transform: rotate(45deg);
+            box-shadow: 0 0 25px rgba(16,185,129,0.5);
         }
         .logo-mark::after {
             content: '';
             position: absolute;
-            top: 35%;
-            left: 35%;
-            right: 35%;
-            bottom: 35%;
-            background: rgba(255,255,255,0.9);
+            width: 20%;
+            height: 20%;
+            background: #10b981;
             border-radius: 50%;
+            box-shadow: 0 0 20px rgba(16,185,129,0.6);
         }
 
         /* Envelope/Print mockup */
@@ -817,67 +850,72 @@
             position: relative;
             width: 80%;
             height: 70%;
+            filter: drop-shadow(0 20px 40px rgba(0,0,0,0.5));
         }
         .envelope {
             position: absolute;
-            width: 65%;
-            aspect-ratio: 2.2;
-            background: linear-gradient(145deg, #f5f5f5, #e0e0e0);
-            border-radius: 4px;
-            top: 5%;
+            width: 70%;
+            aspect-ratio: 1.8;
+            background: linear-gradient(145deg, #252525, #1a1a1a);
+            border-radius: 6px;
+            top: 0;
             left: 0;
-            transform: rotate(-6deg);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            transform: rotate(-5deg);
+            border: 1px solid #333;
         }
         .envelope::before {
             content: '';
             position: absolute;
-            top: 0;
+            top: -1px;
             left: 50%;
-            transform: translateX(-50%);
-            border-left: 40px solid transparent;
-            border-right: 40px solid transparent;
-            border-top: 30px solid #ddd;
+            transform: translateX(-50%) rotate(0deg);
+            border-left: 45px solid transparent;
+            border-right: 45px solid transparent;
+            border-top: 35px solid #1a1a1a;
         }
         .envelope::after {
             content: '';
             position: absolute;
-            top: 15%;
-            left: 8%;
-            width: 20%;
-            height: 15%;
-            background: linear-gradient(135deg, #10b981, #059669);
-            border-radius: 2px;
+            top: 25%;
+            left: 10%;
+            width: 25%;
+            height: 20%;
+            background: #10b981;
+            border-radius: 4px;
+            box-shadow: 0 0 15px rgba(16,185,129,0.4);
         }
         .letterhead {
             position: absolute;
             width: 50%;
-            aspect-ratio: 0.77;
-            background: linear-gradient(180deg, #fafafa, #f0f0f0);
-            border-radius: 2px;
-            top: 20%;
-            right: 5%;
+            aspect-ratio: 0.7;
+            background: linear-gradient(145deg, #1a1a1a, #0d0d0d);
+            border-radius: 4px;
+            top: 25%;
+            right: 0;
             transform: rotate(4deg);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+            border: 1px solid #2a2a2a;
         }
         .letterhead::before {
             content: '';
             position: absolute;
-            top: 8%;
-            left: 10%;
-            width: 30%;
-            height: 12%;
-            background: linear-gradient(135deg, #10b981, #059669);
-            border-radius: 2px;
+            top: 12%;
+            left: 12%;
+            width: 35%;
+            height: 10%;
+            background: #10b981;
+            border-radius: 3px;
+            box-shadow: 0 0 15px rgba(16,185,129,0.3);
         }
         .letterhead::after {
             content: '';
             position: absolute;
-            top: 28%;
-            left: 10%;
-            right: 10%;
-            height: 50%;
-            background: repeating-linear-gradient(180deg, #ccc 0px, #ccc 1px, transparent 1px, transparent 8px);
+            top: 30%;
+            left: 12%;
+            right: 12%;
+            height: 3px;
+            background: #333;
+            border-radius: 2px;
+            box-shadow: 0 10px 0 #2a2a2a, 0 20px 0 #222, 0 30px 0 #1a1a1a;
         }
 
         @media (max-width: 900px) {
@@ -918,6 +956,14 @@
             .credentials { flex-wrap: wrap; gap: 20px; }
             .credential-value { font-size: 1.2rem; }
             .cta-group { flex-direction: column; gap: 14px; }
+            /* Bigger tagline on mobile */
+            .tagline { font-size: 2.2rem; }
+            /* Services 2-wide on mobile */
+            .services-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+            .service-item { padding: 18px 14px; }
+            .service-icon { width: 32px; height: 32px; margin-bottom: 12px; }
+            .service-name { font-size: 0.8rem; }
+            .service-desc { font-size: 0.65rem; }
             /* Mobile brand layout - larger logo above centered name */
             .brand {
                 flex-direction: column;
@@ -982,7 +1028,7 @@
             </div>
 
             <p class="eyebrow">Visual Identity & Brand Strategy</p>
-            <h1 class="tagline">A decade building better brands.</h1>
+            <h1 class="tagline">A decade building<br>better brands.</h1>
             <p class="description">
                 Boutique creative studio turning good businesses into better brands with sharp design and market strategy built different.
             </p>
