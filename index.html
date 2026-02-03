@@ -403,6 +403,15 @@
         .orbit-ring { animation: fadeIn 1.2s ease-out 0.6s both; }
         .header { animation: fadeIn 0.8s ease-out 1s both; }
 
+        /* Scroll hint pulse */
+        @keyframes pulseHint {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+            50% { transform: scale(1.05); box-shadow: 0 0 20px 5px rgba(16, 185, 129, 0.3); }
+        }
+        .pulse-hint {
+            animation: pulseHint 0.5s ease-out 2;
+        }
+
         .modal-close {
             position: fixed;
             top: 24px;
@@ -1612,21 +1621,54 @@
         // Cycle labels periodically
         setInterval(cycleLabels, 3500);
 
-        // Homepage parallax on scroll (mobile)
-        const hero = document.querySelector('.hero');
+        // Homepage scroll detection - reward scroll attempts
         const orbitContainer = document.querySelector('.orbit-container');
         const content = document.querySelector('.content');
+        const ctaSecondary = document.querySelector('.cta-secondary');
+        let scrollAccumulator = 0;
+        let scrollTimeout;
 
+        window.addEventListener('wheel', (e) => {
+            // Only on homepage (not in modal)
+            if (document.getElementById('modal').classList.contains('active')) return;
+
+            scrollAccumulator += Math.abs(e.deltaY);
+
+            // Subtle orbit pulse on scroll
+            if (orbitContainer) {
+                const pulse = 1 + Math.min(Math.abs(e.deltaY) / 500, 0.05);
+                orbitContainer.style.transform = `scale(${pulse})`;
+                orbitContainer.style.transition = 'transform 0.1s ease-out';
+            }
+
+            // Reset after scroll stops
+            clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(() => {
+                if (orbitContainer) {
+                    orbitContainer.style.transform = 'scale(1)';
+                    orbitContainer.style.transition = 'transform 0.4s ease-out';
+                }
+
+                // If they scrolled enough, hint at Learn More
+                if (scrollAccumulator > 300) {
+                    ctaSecondary?.classList.add('pulse-hint');
+                    setTimeout(() => ctaSecondary?.classList.remove('pulse-hint'), 1000);
+                }
+                scrollAccumulator = 0;
+            }, 150);
+        }, { passive: true });
+
+        // Mobile scroll (when viewport becomes scrollable)
         window.addEventListener('scroll', () => {
             const scrollY = window.scrollY;
             const maxScroll = window.innerHeight * 0.5;
             const progress = Math.min(scrollY / maxScroll, 1);
 
-            if (orbitContainer) {
+            if (orbitContainer && window.innerWidth <= 600) {
                 orbitContainer.style.transform = `translateY(${scrollY * 0.15}px) scale(${1 - progress * 0.1})`;
                 orbitContainer.style.opacity = 1 - progress * 0.5;
             }
-            if (content) {
+            if (content && window.innerWidth <= 600) {
                 content.style.transform = `translateY(${scrollY * 0.05}px)`;
                 content.style.opacity = 1 - progress * 0.3;
             }
