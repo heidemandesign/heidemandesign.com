@@ -366,9 +366,9 @@
             padding: 80px clamp(32px, 5vw, 80px);
             position: relative;
             pointer-events: none;
-            transform: translateY(100px);
+            transform: translateY(60px);
             opacity: 0;
-            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s ease;
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
         }
         .modal-overlay.active .modal-content {
             transform: translateY(0);
@@ -1343,39 +1343,6 @@
             document.body.style.overflow = '';
         }
         document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
-
-        // Scroll to open modal from homepage
-        let scrollAccumulator = 0;
-        let isModalTriggered = false;
-
-        window.addEventListener('wheel', (e) => {
-            const modal = document.getElementById('modal');
-            if (modal.classList.contains('active')) return;
-
-            // Accumulate downward scroll
-            if (e.deltaY > 0) {
-                scrollAccumulator += e.deltaY;
-
-                // Open modal after enough scroll
-                if (scrollAccumulator > 150 && !isModalTriggered) {
-                    isModalTriggered = true;
-                    openModal();
-                }
-            } else {
-                // Reset on scroll up
-                scrollAccumulator = Math.max(0, scrollAccumulator + e.deltaY);
-            }
-        }, { passive: true });
-
-        // Reset trigger when modal closes
-        const originalCloseModal = closeModal;
-        closeModal = function() {
-            originalCloseModal();
-            setTimeout(() => {
-                scrollAccumulator = 0;
-                isModalTriggered = false;
-            }, 500);
-        };
 
         // Stop clicks on boxes from closing modal
         document.querySelectorAll('.service-item, .bento-item, .testimonial, .modal-footer, .modal-close').forEach(el => {
