@@ -339,20 +339,26 @@
         .icon-cyan { color: rgba(34, 211, 238, 0.85); }
         .icon-violet { color: rgba(167, 139, 250, 0.85); }
 
-        /* Modal */
+        /* Modal - bottom sheet style */
         .modal-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(10, 14, 20, 0.75);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            background: rgba(10, 14, 20, 0);
+            backdrop-filter: blur(0px);
+            -webkit-backdrop-filter: blur(0px);
             z-index: 200;
             opacity: 0;
             visibility: hidden;
-            transition: all 0.4s ease;
+            transition: background 0.4s ease, backdrop-filter 0.4s ease, opacity 0.3s ease, visibility 0.3s ease;
             overflow-y: auto;
         }
-        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+            background: rgba(10, 14, 20, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
 
         .modal-content {
             max-width: 1000px;
@@ -360,6 +366,13 @@
             padding: 80px clamp(32px, 5vw, 80px);
             position: relative;
             pointer-events: none;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s ease;
+        }
+        .modal-overlay.active .modal-content {
+            transform: translateY(0);
+            opacity: 1;
         }
         .modal-content .service-item,
         .modal-content .bento-item,
@@ -371,14 +384,14 @@
         /* Scroll reveal animations */
         .reveal {
             opacity: 0;
-            transform: translateY(30px);
-            transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateY(40px);
+            transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .reveal.visible {
             opacity: 1;
             transform: translateY(0);
         }
-        .reveal-stagger { transition-delay: calc(var(--i, 0) * 0.08s); }
+        .reveal-stagger { transition-delay: calc(var(--i, 0) * 0.12s); }
 
         /* Homepage entrance animations */
         @keyframes fadeUp {
@@ -403,20 +416,6 @@
         .orbit-ring { animation: fadeIn 1.2s ease-out 0.6s both; }
         .header { animation: fadeIn 0.8s ease-out 1s both; }
 
-        /* Scroll energy state */
-        .orbit-energized .orbit-dot {
-            animation-duration: 0.8s !important;
-            box-shadow: 0 0 20px var(--accent), 0 0 40px var(--accent-glow), 0 0 60px var(--accent-glow) !important;
-        }
-        .orbit-energized .orbit-track-1 { animation-duration: 20s !important; }
-        .orbit-energized .orbit-track-2 { animation-duration: 15s !important; }
-        .orbit-energized .orbit-track-3 { animation-duration: 12s !important; }
-        .orbit-energized .orbit-center {
-            background: radial-gradient(circle, rgba(16, 185, 129, 0.4) 0%, transparent 70%) !important;
-        }
-        .orbit-energized .orbit-ring {
-            border-color: rgba(255, 255, 255, 0.08) !important;
-        }
 
         .modal-close {
             position: fixed;
@@ -1345,6 +1344,39 @@
         }
         document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
 
+        // Scroll to open modal from homepage
+        let scrollAccumulator = 0;
+        let isModalTriggered = false;
+
+        window.addEventListener('wheel', (e) => {
+            const modal = document.getElementById('modal');
+            if (modal.classList.contains('active')) return;
+
+            // Accumulate downward scroll
+            if (e.deltaY > 0) {
+                scrollAccumulator += e.deltaY;
+
+                // Open modal after enough scroll
+                if (scrollAccumulator > 150 && !isModalTriggered) {
+                    isModalTriggered = true;
+                    openModal();
+                }
+            } else {
+                // Reset on scroll up
+                scrollAccumulator = Math.max(0, scrollAccumulator + e.deltaY);
+            }
+        }, { passive: true });
+
+        // Reset trigger when modal closes
+        const originalCloseModal = closeModal;
+        closeModal = function() {
+            originalCloseModal();
+            setTimeout(() => {
+                scrollAccumulator = 0;
+                isModalTriggered = false;
+            }, 500);
+        };
+
         // Stop clicks on boxes from closing modal
         document.querySelectorAll('.service-item, .bento-item, .testimonial, .modal-footer, .modal-close').forEach(el => {
             el.addEventListener('click', (e) => e.stopPropagation());
@@ -1627,47 +1659,6 @@
         // Cycle labels periodically
         setInterval(cycleLabels, 3500);
 
-        // Homepage scroll detection - energize the orbit
-        const orbitContainer = document.querySelector('.orbit-container');
-        const content = document.querySelector('.content');
-        let scrollTimeout;
-        let isEnergized = false;
-
-        window.addEventListener('wheel', (e) => {
-            // Only on homepage (not in modal)
-            if (document.getElementById('modal').classList.contains('active')) return;
-
-            // Energize the orbit on scroll
-            if (!isEnergized && orbitContainer) {
-                orbitContainer.classList.add('orbit-energized');
-                isEnergized = true;
-            }
-
-            // Reset after scroll stops
-            clearTimeout(scrollTimeout);
-            scrollTimeout = setTimeout(() => {
-                if (orbitContainer) {
-                    orbitContainer.classList.remove('orbit-energized');
-                    isEnergized = false;
-                }
-            }, 800);
-        }, { passive: true });
-
-        // Mobile scroll (when viewport becomes scrollable)
-        window.addEventListener('scroll', () => {
-            const scrollY = window.scrollY;
-            const maxScroll = window.innerHeight * 0.5;
-            const progress = Math.min(scrollY / maxScroll, 1);
-
-            if (orbitContainer && window.innerWidth <= 600) {
-                orbitContainer.style.transform = `translateY(${scrollY * 0.15}px) scale(${1 - progress * 0.1})`;
-                orbitContainer.style.opacity = 1 - progress * 0.5;
-            }
-            if (content && window.innerWidth <= 600) {
-                content.style.transform = `translateY(${scrollY * 0.05}px)`;
-                content.style.opacity = 1 - progress * 0.3;
-            }
-        }, { passive: true });
     </script>
 </body>
 </html>
