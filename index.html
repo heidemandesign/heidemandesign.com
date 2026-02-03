@@ -930,23 +930,28 @@
             .brand-name {
                 text-align: center;
             }
-            /* Smaller orbit for mobile */
+            /* Smaller orbit for mobile - contained properly */
             .orbit-container {
-                max-width: 200px;
+                max-width: 180px;
+                margin-bottom: 30px;
             }
             /* Smaller labels for mobile */
             .orbit-label {
-                padding: 5px 10px;
-                font-size: 0.45rem;
-                gap: 5px;
+                padding: 4px 8px;
+                font-size: 0.4rem;
+                gap: 4px;
             }
             .label-icon {
-                width: 9px;
-                height: 9px;
+                width: 8px;
+                height: 8px;
             }
-            /* Less hero gap on mobile */
+            /* Visual section spacing */
             .visual {
-                margin-bottom: -20px;
+                padding: 20px 0;
+            }
+            /* Make sure orbit doesn't overflow */
+            .labels-container {
+                overflow: visible;
             }
         }
     </style>
