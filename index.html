@@ -100,6 +100,9 @@
         }
         .status:hover { opacity: 0.8; }
         .version {
+            position: absolute;
+            top: -14px;
+            left: 0;
             font-size: 0.55rem;
             font-weight: 500;
             letter-spacing: 0.08em;
@@ -107,8 +110,10 @@
             color: var(--text-muted);
             opacity: 0;
             transition: opacity 0.3s ease;
+            pointer-events: none;
         }
-        .header:hover .version {
+        .brand:hover .version,
+        .brand.show-version .version {
             opacity: 0.5;
         }
         .status-dot {
@@ -144,6 +149,8 @@
             gap: 14px;
             margin-bottom: clamp(32px, 4vh, 52px);
             margin-top: -20px;
+            position: relative;
+            cursor: pointer;
         }
         .brand-logo {
             width: 48px;
@@ -384,30 +391,49 @@
             padding: 80px clamp(32px, 5vw, 80px);
             position: relative;
             pointer-events: none;
-            transform: translateY(100vh);
-            opacity: 0;
-            transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease;
         }
 
+        /* Interactive scroll state - no transitions, direct control */
+        .modal-overlay.interactive {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: none;
+        }
+
+        /* Snapping transitions */
+        .modal-overlay.snapping {
+            transition: background 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                        backdrop-filter 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .modal-overlay.snapping .modal-content {
+            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+                        opacity 0.4s ease;
+        }
+
+        /* Fully open state */
         .modal-overlay.active {
             opacity: 1;
             visibility: visible;
             background: rgba(10, 14, 20, 0.75);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            transition: background 0.5s ease, backdrop-filter 0.5s ease, opacity 0.3s ease;
+            pointer-events: auto;
         }
         .modal-overlay.active .modal-content {
             transform: translateY(0);
             opacity: 1;
         }
 
-        .modal-overlay:not(.active) {
+        /* Fully closed state */
+        .modal-overlay.closed {
             opacity: 0;
             visibility: hidden;
             background: rgba(10, 14, 20, 0);
             backdrop-filter: blur(0);
-            transition: opacity 0.4s ease, visibility 0.4s ease, background 0.4s ease;
+        }
+        .modal-overlay.closed .modal-content {
+            transform: translateY(100%);
+            opacity: 0;
         }
         .modal-content .service-item,
         .modal-content .bento-item,
@@ -1102,7 +1128,7 @@
     <div class="ambient-glow glow-2"></div>
 
     <header class="header">
-        <span class="version">v1.3</span>
+        <div></div>
         <a href="mailto:moshe@heidemandesign.com" class="status">
             <span class="status-dot"></span>
             <span>Available for select projects</span>
@@ -1111,7 +1137,8 @@
 
     <section class="hero">
         <div class="content">
-            <div class="brand">
+            <div class="brand" id="brand">
+                <span class="version">v1.4</span>
                 <svg class="brand-logo" viewBox="0 0 216 172.8"><path d="M120.75,112.42c0-16.13-6.28-31.29-17.68-42.69-11.4-11.4-26.57-17.68-42.69-17.68-12.67,0-24.75,3.88-34.87,11.08V25.5C25.5,11.42,14.08,0,0,0v147.3c0,14.08,11.42,25.5,25.5,25.5h0v-60.04c0-19.28,15.5-35.16,34.78-35.21,19.28-.05,34.97,15.61,34.97,34.87,0,16.13,6.28,31.29,17.68,42.69,11.4,11.4,26.56,17.68,42.69,17.68s31.29-6.28,42.69-17.68c11.4-11.4,17.68-26.57,17.68-42.69V0c-14.08,0-25.5,8.42-25.5,22.5v40.62c-10.13-7.2-22.2-11.08-34.87-11.08s-25.62,4.19-35.98,11.89c4.63,5.65,8.41,11.9,11.27,18.67.53,1.26,1.02,2.52,1.49,3.8,6.39-5.71,14.64-8.86,23.22-8.86,19.32,0,35.02,15.79,34.87,35.15-.15,18.97-15.63,34.46-34.6,34.6-19.35.15-35.15-15.55-35.15-34.87Z"/></svg>
                 <span class="brand-name">
                     <span>Heideman</span>
@@ -1370,14 +1397,36 @@
 
     <script>
         function openModal() {
-            document.getElementById('modal').classList.add('active');
+            const modal = document.getElementById('modal');
+            modal.classList.remove('closed', 'interactive', 'snapping');
+            modal.classList.add('active');
             document.body.style.overflow = 'hidden';
+            // Update scroll system state
+            if (typeof isFullyOpen !== 'undefined') {
+                isFullyOpen = true;
+                progress = 1;
+            }
         }
         function closeModal() {
-            document.getElementById('modal').classList.remove('active');
+            const modal = document.getElementById('modal');
+            modal.classList.remove('active', 'interactive');
+            modal.classList.add('snapping', 'closed');
             document.body.style.overflow = '';
-            // Reset scroll trigger after a delay so user can scroll to open again
-            setTimeout(() => { scrollTriggered = false; }, 500);
+            // Clear any inline styles
+            modal.style.background = '';
+            modal.style.backdropFilter = '';
+            modal.style.webkitBackdropFilter = '';
+            const content = modal.querySelector('.modal-content');
+            if (content) {
+                content.style.transform = '';
+                content.style.opacity = '';
+            }
+            setTimeout(() => modal.classList.remove('snapping'), 500);
+            // Update scroll system state
+            if (typeof isFullyOpen !== 'undefined') {
+                isFullyOpen = false;
+                progress = 0;
+            }
         }
         document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
 
@@ -1663,53 +1712,153 @@
         // Cycle labels periodically
         setInterval(cycleLabels, 3500);
 
-        // Smooth scroll-to-open modal
-        let scrollAccum = 0;
-        let scrollTriggered = false;
-        let decayTimer = null;
+        // Smooth interactive scroll-to-reveal modal
+        const modalContent = modal.querySelector('.modal-content');
+        let progress = 0; // 0 = closed, 1 = open
+        let isInteracting = false;
+        let isFullyOpen = false;
+        let snapTimer = null;
+        const scrollSensitivity = 0.003; // How much scroll affects progress
+        const touchSensitivity = 0.004;
+        const snapThreshold = 0.35; // Progress needed to snap open
 
+        function updateModalVisuals(p) {
+            // Clamp progress
+            p = Math.max(0, Math.min(1, p));
+
+            // Calculate values with easing for smoother feel
+            const eased = p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
+            const yOffset = 100 - (eased * 100);
+            const opacity = eased;
+            const bgOpacity = eased * 0.75;
+            const blur = eased * 12;
+
+            modalContent.style.transform = `translateY(${yOffset}%)`;
+            modalContent.style.opacity = opacity;
+            modal.style.background = `rgba(10, 14, 20, ${bgOpacity})`;
+            modal.style.backdropFilter = `blur(${blur}px)`;
+            modal.style.webkitBackdropFilter = `blur(${blur}px)`;
+        }
+
+        function startInteraction() {
+            if (isFullyOpen) return;
+            if (!isInteracting) {
+                isInteracting = true;
+                modal.classList.remove('closed', 'active', 'snapping');
+                modal.classList.add('interactive');
+                // Clear inline styles from snapping
+                modal.style.background = '';
+                modal.style.backdropFilter = '';
+                modal.style.webkitBackdropFilter = '';
+                modalContent.style.transform = '';
+                modalContent.style.opacity = '';
+            }
+            if (snapTimer) {
+                clearTimeout(snapTimer);
+                snapTimer = null;
+            }
+        }
+
+        function snapToState() {
+            isInteracting = false;
+            modal.classList.remove('interactive');
+            modal.classList.add('snapping');
+
+            // Clear inline styles so CSS classes take over
+            modal.style.background = '';
+            modal.style.backdropFilter = '';
+            modal.style.webkitBackdropFilter = '';
+            modalContent.style.transform = '';
+            modalContent.style.opacity = '';
+
+            if (progress >= snapThreshold) {
+                // Snap open
+                modal.classList.remove('closed');
+                modal.classList.add('active');
+                isFullyOpen = true;
+                progress = 1;
+                document.body.style.overflow = 'hidden';
+            } else {
+                // Snap closed
+                modal.classList.remove('active');
+                modal.classList.add('closed');
+                isFullyOpen = false;
+                progress = 0;
+            }
+
+            // Remove snapping class after transition
+            setTimeout(() => {
+                modal.classList.remove('snapping');
+            }, 500);
+        }
+
+        function handleScrollDelta(delta) {
+            // delta > 0 means scroll down (open), delta < 0 means scroll up (close)
+            if (isFullyOpen && delta > 0) return; // Already open, ignore down scroll
+
+            if (isFullyOpen && delta < 0) {
+                // Start closing from fully open
+                isFullyOpen = false;
+                progress = 1;
+                document.body.style.overflow = '';
+            }
+
+            startInteraction();
+            progress += delta;
+            progress = Math.max(0, Math.min(1, progress));
+            updateModalVisuals(progress);
+
+            // Set snap timer
+            if (snapTimer) clearTimeout(snapTimer);
+            snapTimer = setTimeout(snapToState, 200);
+        }
+
+        // Mouse wheel
         document.addEventListener('wheel', (e) => {
-            if (scrollTriggered || modal.classList.contains('active')) return;
+            const delta = e.deltaY * scrollSensitivity;
+            handleScrollDelta(delta);
+        }, { passive: true });
 
-            // Accumulate downward scroll
-            if (e.deltaY > 0) {
-                scrollAccum += e.deltaY;
+        // Touch handling
+        let touchStartY = 0;
+        let lastTouchY = 0;
+        let touchVelocity = 0;
 
-                // Clear decay timer on new scroll
-                if (decayTimer) clearTimeout(decayTimer);
+        document.addEventListener('touchstart', (e) => {
+            touchStartY = e.touches[0].clientY;
+            lastTouchY = touchStartY;
+            touchVelocity = 0;
+        }, { passive: true });
 
-                // Open when accumulated enough
-                if (scrollAccum > 150) {
-                    scrollTriggered = true;
-                    openModal();
-                    scrollAccum = 0;
-                } else {
-                    // Decay accumulated scroll if user stops
-                    decayTimer = setTimeout(() => {
-                        scrollAccum = 0;
-                    }, 300);
+        document.addEventListener('touchmove', (e) => {
+            const currentY = e.touches[0].clientY;
+            const deltaY = (lastTouchY - currentY) * touchSensitivity;
+            touchVelocity = lastTouchY - currentY;
+            lastTouchY = currentY;
+            handleScrollDelta(deltaY);
+        }, { passive: true });
+
+        document.addEventListener('touchend', () => {
+            // Use velocity to determine final state
+            if (Math.abs(touchVelocity) > 10) {
+                if (touchVelocity > 0 && progress > 0.1) {
+                    progress = snapThreshold + 0.1; // Will snap open
+                } else if (touchVelocity < 0 && progress < 0.9) {
+                    progress = snapThreshold - 0.1; // Will snap closed
                 }
             }
+            if (snapTimer) clearTimeout(snapTimer);
+            snapTimer = setTimeout(snapToState, 50);
         }, { passive: true });
 
-        // Touch support - swipe up opens modal
-        let touchStartY = 0;
-        document.addEventListener('touchstart', (e) => {
-            if (modal.classList.contains('active')) return;
-            touchStartY = e.touches[0].clientY;
-        }, { passive: true });
+        // Mobile version toggle on logo tap
+        const brand = document.getElementById('brand');
+        brand.addEventListener('click', () => {
+            brand.classList.toggle('show-version');
+        });
 
-        document.addEventListener('touchend', (e) => {
-            if (scrollTriggered || modal.classList.contains('active')) return;
-            const touchEndY = e.changedTouches[0].clientY;
-            const deltaY = touchStartY - touchEndY;
-
-            // Swipe up (80px threshold)
-            if (deltaY > 80) {
-                scrollTriggered = true;
-                openModal();
-            }
-        }, { passive: true });
+        // Initialize modal as closed
+        modal.classList.add('closed');
 
     </script>
 </body>
