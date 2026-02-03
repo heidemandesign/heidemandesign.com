@@ -1295,6 +1295,11 @@
         }
         document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
 
+        // Stop clicks on boxes from closing modal
+        document.querySelectorAll('.service-item, .bento-item, .testimonial, .modal-footer, .modal-close').forEach(el => {
+            el.addEventListener('click', (e) => e.stopPropagation());
+        });
+
         // Services data - ordered: main services first, niche later
         // Colors: blue, amber, rose, cyan, violet (no green - reserved for dots)
         const services = [
