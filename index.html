@@ -242,6 +242,7 @@
             border-radius: 50%;
             top: 50%; left: 50%;
             transform: translate(-50%, -50%);
+            z-index: 1;
         }
         .orbit-ring-1 { width: 100%; height: 100%; }
         .orbit-ring-2 { width: 72%; height: 72%; }
@@ -278,12 +279,17 @@
             to { transform: translate(-50%, -50%) rotate(360deg); }
         }
 
+        .orbit-track {
+            z-index: 2;
+        }
+
         .orbit-dot {
             position: absolute;
             width: 6px; height: 6px;
             background: var(--accent);
             border-radius: 50%;
             animation: dotGlow 2s ease-in-out infinite;
+            z-index: 3;
         }
         @keyframes dotGlow {
             0%, 100% { opacity: 0.7; box-shadow: 0 0 8px var(--accent-glow), 0 0 16px var(--accent-glow); }
