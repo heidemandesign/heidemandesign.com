@@ -470,17 +470,22 @@
             overflow: hidden;
             cursor: pointer;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.4s ease, box-shadow 0.4s ease;
             border: 1px solid rgba(255,255,255,0.04);
             position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
+            transform: translateZ(0);
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
         }
-        .bento-item:hover {
-            transform: translateY(-6px);
-            border-color: rgba(16,185,129,0.3);
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(16,185,129,0.1);
+        @media (hover: hover) {
+            .bento-item:hover {
+                transform: translateY(-6px) translateZ(0);
+                border-color: rgba(16,185,129,0.3);
+                box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(16,185,129,0.1);
+            }
         }
 
         /* Bento sizes */
