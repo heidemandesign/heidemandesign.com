@@ -403,13 +403,19 @@
         .orbit-ring { animation: fadeIn 1.2s ease-out 0.6s both; }
         .header { animation: fadeIn 0.8s ease-out 1s both; }
 
-        /* Scroll hint pulse */
-        @keyframes pulseHint {
-            0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
-            50% { transform: scale(1.05); box-shadow: 0 0 20px 5px rgba(16, 185, 129, 0.3); }
+        /* Scroll energy state */
+        .orbit-energized .orbit-dot {
+            animation-duration: 0.8s !important;
+            box-shadow: 0 0 20px var(--accent), 0 0 40px var(--accent-glow), 0 0 60px var(--accent-glow) !important;
         }
-        .pulse-hint {
-            animation: pulseHint 0.5s ease-out 2;
+        .orbit-energized .orbit-track-1 { animation-duration: 20s !important; }
+        .orbit-energized .orbit-track-2 { animation-duration: 15s !important; }
+        .orbit-energized .orbit-track-3 { animation-duration: 12s !important; }
+        .orbit-energized .orbit-center {
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.4) 0%, transparent 70%) !important;
+        }
+        .orbit-energized .orbit-ring {
+            border-color: rgba(255, 255, 255, 0.08) !important;
         }
 
         .modal-close {
@@ -1621,41 +1627,30 @@
         // Cycle labels periodically
         setInterval(cycleLabels, 3500);
 
-        // Homepage scroll detection - reward scroll attempts
+        // Homepage scroll detection - energize the orbit
         const orbitContainer = document.querySelector('.orbit-container');
         const content = document.querySelector('.content');
-        const ctaSecondary = document.querySelector('.cta-secondary');
-        let scrollAccumulator = 0;
         let scrollTimeout;
+        let isEnergized = false;
 
         window.addEventListener('wheel', (e) => {
             // Only on homepage (not in modal)
             if (document.getElementById('modal').classList.contains('active')) return;
 
-            scrollAccumulator += Math.abs(e.deltaY);
-
-            // Subtle orbit pulse on scroll
-            if (orbitContainer) {
-                const pulse = 1 + Math.min(Math.abs(e.deltaY) / 500, 0.05);
-                orbitContainer.style.transform = `scale(${pulse})`;
-                orbitContainer.style.transition = 'transform 0.1s ease-out';
+            // Energize the orbit on scroll
+            if (!isEnergized && orbitContainer) {
+                orbitContainer.classList.add('orbit-energized');
+                isEnergized = true;
             }
 
             // Reset after scroll stops
             clearTimeout(scrollTimeout);
             scrollTimeout = setTimeout(() => {
                 if (orbitContainer) {
-                    orbitContainer.style.transform = 'scale(1)';
-                    orbitContainer.style.transition = 'transform 0.4s ease-out';
+                    orbitContainer.classList.remove('orbit-energized');
+                    isEnergized = false;
                 }
-
-                // If they scrolled enough, hint at Learn More
-                if (scrollAccumulator > 300) {
-                    ctaSecondary?.classList.add('pulse-hint');
-                    setTimeout(() => ctaSecondary?.classList.remove('pulse-hint'), 1000);
-                }
-                scrollAccumulator = 0;
-            }, 150);
+            }, 800);
         }, { passive: true });
 
         // Mobile scroll (when viewport becomes scrollable)
