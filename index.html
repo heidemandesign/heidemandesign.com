@@ -278,12 +278,21 @@
             to { transform: translate(-50%, -50%) rotate(360deg); }
         }
 
+        .orbit-track {
+            contain: layout style paint;
+            will-change: transform;
+            transform: translateZ(0);
+            backface-visibility: hidden;
+        }
+
         .orbit-dot {
             position: absolute;
             width: 6px; height: 6px;
             background: var(--accent);
             border-radius: 50%;
             animation: dotGlow 2s ease-in-out infinite;
+            will-change: opacity, box-shadow;
+            contain: layout style;
         }
         @keyframes dotGlow {
             0%, 100% { opacity: 0.7; box-shadow: 0 0 8px var(--accent-glow), 0 0 16px var(--accent-glow); }
@@ -314,13 +323,13 @@
             color: var(--text-muted);
             white-space: nowrap;
             opacity: 0;
-            transition: opacity 1.2s ease-out;
+            transition: opacity 1.8s ease-out;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
             transform: translate(-50%, -50%);
         }
 
         .orbit-label.visible { opacity: 1; }
-        .orbit-label.fading { opacity: 0; transition: opacity 0.8s ease-out; }
+        .orbit-label.fading { opacity: 0; transition: opacity 1.2s ease-out; }
 
         .label-icon {
             width: 12px; height: 12px;
@@ -366,13 +375,55 @@
             padding: 80px clamp(32px, 5vw, 80px);
             position: relative;
             pointer-events: none;
-            transform: translateY(60px);
+        }
+
+        /* Modal scroll-reveal state */
+        .modal-overlay.scroll-reveal {
+            opacity: 1;
+            visibility: visible;
+            background: rgba(10, 14, 20, 0);
+            backdrop-filter: blur(0px);
+            -webkit-backdrop-filter: blur(0px);
+            pointer-events: none;
+            transition: none;
+        }
+        .modal-overlay.scroll-reveal .modal-content {
+            transform: translateY(var(--modal-y, 100%));
+            opacity: var(--modal-opacity, 0);
+            transition: none;
+        }
+        .modal-overlay.scroll-reveal .modal-close {
             opacity: 0;
-            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
+            pointer-events: none;
+        }
+
+        /* Fully open modal state */
+        .modal-overlay.active {
+            background: rgba(10, 14, 20, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            pointer-events: auto;
+            transition: background 0.3s ease, backdrop-filter 0.3s ease;
         }
         .modal-overlay.active .modal-content {
             transform: translateY(0);
             opacity: 1;
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+        }
+        .modal-overlay.active .modal-close {
+            opacity: 1;
+            transition: opacity 0.3s ease 0.2s;
+        }
+
+        /* Hidden modal state */
+        .modal-overlay:not(.active):not(.scroll-reveal) {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .modal-overlay:not(.active):not(.scroll-reveal) .modal-content {
+            transform: translateY(60px);
+            opacity: 0;
         }
         .modal-content .service-item,
         .modal-content .bento-item,
@@ -1340,7 +1391,10 @@
         }
         function closeModal() {
             document.getElementById('modal').classList.remove('active');
+            document.getElementById('modal').classList.remove('scroll-reveal');
             document.body.style.overflow = '';
+            scrollProgress = 0;
+            isScrollRevealing = false;
         }
         document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
 
@@ -1625,6 +1679,127 @@
 
         // Cycle labels periodically
         setInterval(cycleLabels, 3500);
+
+        // Interactive scroll-to-reveal modal
+        const modal = document.getElementById('modal');
+        let scrollProgress = 0;
+        const scrollThreshold = 300; // Total scroll needed to fully open
+        let isScrollRevealing = false;
+        let scrollTimeout = null;
+
+        function updateModalProgress() {
+            const progress = Math.min(1, scrollProgress / scrollThreshold);
+
+            if (progress > 0 && progress < 1) {
+                // In progress - show partial modal
+                if (!isScrollRevealing) {
+                    modal.classList.add('scroll-reveal');
+                    modal.classList.remove('active');
+                    isScrollRevealing = true;
+                }
+
+                const yOffset = 100 - (progress * 100); // 100% to 0%
+                const opacity = progress;
+                const bgOpacity = progress * 0.75;
+                const blur = progress * 12;
+
+                modal.style.setProperty('--modal-y', yOffset + '%');
+                modal.style.setProperty('--modal-opacity', opacity);
+                modal.style.background = `rgba(10, 14, 20, ${bgOpacity})`;
+                modal.style.backdropFilter = `blur(${blur}px)`;
+                modal.style.webkitBackdropFilter = `blur(${blur}px)`;
+            } else if (progress >= 1) {
+                // Fully open
+                modal.classList.remove('scroll-reveal');
+                modal.classList.add('active');
+                modal.style.removeProperty('--modal-y');
+                modal.style.removeProperty('--modal-opacity');
+                modal.style.background = '';
+                modal.style.backdropFilter = '';
+                modal.style.webkitBackdropFilter = '';
+                isScrollRevealing = false;
+                scrollProgress = 0; // Reset for next time
+                document.body.style.overflow = 'hidden';
+            } else {
+                // Closed
+                modal.classList.remove('scroll-reveal');
+                modal.classList.remove('active');
+                modal.style.removeProperty('--modal-y');
+                modal.style.removeProperty('--modal-opacity');
+                modal.style.background = '';
+                modal.style.backdropFilter = '';
+                modal.style.webkitBackdropFilter = '';
+                isScrollRevealing = false;
+            }
+        }
+
+        // Listen for wheel events on the page when modal is not fully open
+        document.addEventListener('wheel', (e) => {
+            // Only handle if modal is not fully active
+            if (modal.classList.contains('active')) return;
+
+            // Only trigger on scroll down
+            if (e.deltaY > 0) {
+                scrollProgress += e.deltaY * 0.5;
+                updateModalProgress();
+
+                // Clear any pending reset
+                if (scrollTimeout) clearTimeout(scrollTimeout);
+
+                // If user stops scrolling mid-reveal, slowly snap back or forward
+                scrollTimeout = setTimeout(() => {
+                    const progress = scrollProgress / scrollThreshold;
+                    if (progress > 0.4) {
+                        // Snap to fully open
+                        scrollProgress = scrollThreshold;
+                        updateModalProgress();
+                    } else {
+                        // Snap back to closed
+                        scrollProgress = 0;
+                        updateModalProgress();
+                    }
+                }, 200);
+            } else if (e.deltaY < 0 && isScrollRevealing) {
+                // Allow scrolling back up to close during reveal
+                scrollProgress = Math.max(0, scrollProgress + e.deltaY * 0.5);
+                updateModalProgress();
+            }
+        }, { passive: true });
+
+        // Touch support for mobile
+        let touchStartY = 0;
+        let lastTouchY = 0;
+
+        document.addEventListener('touchstart', (e) => {
+            if (modal.classList.contains('active')) return;
+            touchStartY = e.touches[0].clientY;
+            lastTouchY = touchStartY;
+        }, { passive: true });
+
+        document.addEventListener('touchmove', (e) => {
+            if (modal.classList.contains('active')) return;
+
+            const currentY = e.touches[0].clientY;
+            const deltaY = lastTouchY - currentY; // Positive when swiping up
+            lastTouchY = currentY;
+
+            if (deltaY > 0 || isScrollRevealing) {
+                scrollProgress = Math.max(0, scrollProgress + deltaY * 1.5);
+                updateModalProgress();
+            }
+        }, { passive: true });
+
+        document.addEventListener('touchend', () => {
+            if (!isScrollRevealing) return;
+
+            const progress = scrollProgress / scrollThreshold;
+            if (progress > 0.4) {
+                scrollProgress = scrollThreshold;
+            } else {
+                scrollProgress = 0;
+            }
+            updateModalProgress();
+        }, { passive: true });
 
     </script>
 </body>
