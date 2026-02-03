@@ -47,8 +47,10 @@
             content: '';
             position: fixed;
             inset: 0;
-            background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
-            background-size: 24px 24px;
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 60px 60px;
             pointer-events: none;
             z-index: 0;
         }
@@ -71,8 +73,8 @@
             pointer-events: none;
             z-index: 0;
         }
-        .glow-1 { width: 500px; height: 500px; top: 30%; right: 25%; background: rgba(16, 185, 129, 0.04); }
-        .glow-2 { width: 400px; height: 400px; bottom: 30%; left: 20%; background: rgba(59, 130, 246, 0.03); }
+        .glow-1 { width: 600px; height: 400px; bottom: -10%; right: 20%; background: rgba(16, 185, 129, 0.06); }
+        .glow-2 { width: 500px; height: 300px; bottom: -5%; left: 10%; background: rgba(16, 185, 129, 0.04); }
 
         .header {
             position: fixed;
@@ -358,6 +360,11 @@
             max-width: 1000px;
             margin: 0 auto;
             padding: 80px clamp(32px, 5vw, 80px);
+            position: relative;
+            pointer-events: none;
+        }
+        .modal-content > * {
+            pointer-events: auto;
         }
 
         .modal-close {
@@ -677,15 +684,15 @@
             overflow: hidden;
         }
         .deck-slide::before {
-            content: '$2.4M';
+            content: '';
             position: absolute;
             top: 12%;
             left: 8%;
-            font-size: clamp(16px, 3vw, 28px);
-            font-weight: 700;
-            color: #10b981;
-            font-family: system-ui;
-            text-shadow: 0 0 20px rgba(16,185,129,0.5);
+            width: 40%;
+            height: 4px;
+            background: #10b981;
+            border-radius: 2px;
+            box-shadow: 0 0 15px rgba(16,185,129,0.4), 0 12px 0 #333, 0 22px 0 #2a2a2a;
         }
         .deck-slide::after {
             content: '';
@@ -1106,7 +1113,7 @@
                 <line x1="6" y1="6" x2="18" y2="18"/>
             </svg>
         </button>
-        <div class="modal-content" onclick="event.stopPropagation()">
+        <div class="modal-content">
             <p class="section-header">Services</p>
             <div class="services-grid">
                 <div class="service-item">
@@ -1143,8 +1150,18 @@
 
             <p class="section-header">Selected Work</p>
             <div class="portfolio-bento">
-                <!-- Large - Websites -->
-                <div class="bento-item bento-large" style="background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);">
+                <!-- Large - Logo Design (FIRST) -->
+                <div class="bento-item bento-large" style="background: linear-gradient(145deg, #0d1117 0%, #161b22 100%);">
+                    <div class="mockup-logo">
+                        <div class="logo-mark"></div>
+                    </div>
+                    <div class="bento-label">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 4L4 8v8l8 4 8-4V8l-8-4z"/><path d="M12 12v8"/><path d="M4 8l8 4 8-4"/></svg>
+                        Logo Design
+                    </div>
+                </div>
+                <!-- Tall - Websites (SECOND) -->
+                <div class="bento-item bento-tall" style="background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);">
                     <div class="mockup-laptop">
                         <div class="laptop-screen"><div class="laptop-content"></div></div>
                         <div class="laptop-base"></div>
@@ -1154,8 +1171,8 @@
                         Websites
                     </div>
                 </div>
-                <!-- Tall - Brand Identity -->
-                <div class="bento-item bento-tall" style="background: linear-gradient(145deg, #0d1117 0%, #1a1f28 100%);">
+                <!-- Wide - Brand Identity (THIRD) -->
+                <div class="bento-item bento-wide" style="background: linear-gradient(145deg, #0d1117 0%, #1a1f28 100%);">
                     <div class="mockup-cards">
                         <div class="card-back"></div>
                         <div class="card-front"></div>
@@ -1165,8 +1182,8 @@
                         Brand Identity
                     </div>
                 </div>
-                <!-- Wide - Pitch Decks -->
-                <div class="bento-item bento-wide" style="background: linear-gradient(160deg, #0d1117 0%, #161b22 100%);">
+                <!-- Medium - Pitch Decks -->
+                <div class="bento-item bento-medium" style="background: linear-gradient(160deg, #0d1117 0%, #161b22 100%);">
                     <div class="mockup-deck">
                         <div class="deck-shadow"></div>
                         <div class="deck-slide"></div>
@@ -1176,8 +1193,8 @@
                         Pitch Decks
                     </div>
                 </div>
-                <!-- Medium - Events -->
-                <div class="bento-item bento-medium" style="background: linear-gradient(140deg, #0d1117 0%, #1a1f28 100%);">
+                <!-- Small - Events -->
+                <div class="bento-item bento-small" style="background: linear-gradient(140deg, #0d1117 0%, #1a1f28 100%);">
                     <div class="mockup-banner">
                         <div class="banner-stand">
                             <div class="banner-panel"></div>
@@ -1186,7 +1203,7 @@
                     </div>
                     <div class="bento-label">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="3" width="14" height="10" rx="1"/><path d="M12 13v8"/><path d="M8 21h8"/></svg>
-                        Events & Signage
+                        Events
                     </div>
                 </div>
                 <!-- Small - Marketing -->
@@ -1208,17 +1225,7 @@
                     </div>
                     <div class="bento-label">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="6" width="16" height="12" rx="1"/><path d="M4 9l8 5 8-5"/></svg>
-                        Print & Stationery
-                    </div>
-                </div>
-                <!-- Small - Logo -->
-                <div class="bento-item bento-small" style="background: linear-gradient(145deg, #0d1117 0%, #161b22 100%);">
-                    <div class="mockup-logo">
-                        <div class="logo-mark"></div>
-                    </div>
-                    <div class="bento-label">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 4L4 8v8l8 4 8-4V8l-8-4z"/><path d="M12 12v8"/><path d="M4 8l8 4 8-4"/></svg>
-                        Logo Design
+                        Print
                     </div>
                 </div>
             </div>
@@ -1228,7 +1235,7 @@
                 <div class="testimonials-track">
                     <div class="testimonial">
                         <p class="testimonial-text">"Both concepts looked great. Amazing turnaround on a last-minute request. Made us look polished when we needed it most."</p>
-                        <p class="testimonial-author">Jay Begun</p>
+                        <p class="testimonial-author">Jay</p>
                         <p class="testimonial-role">Motzen Shabbos</p>
                     </div>
                     <div class="testimonial">
@@ -1238,7 +1245,7 @@
                     </div>
                     <div class="testimonial">
                         <p class="testimonial-text">"We really appreciate the wonderful job on our annual calendars. Professional, easy to work with, and always delivers on time."</p>
-                        <p class="testimonial-author">Golda Goldberg</p>
+                        <p class="testimonial-author">Golda</p>
                         <p class="testimonial-role">Community Outreach</p>
                     </div>
                     <div class="testimonial">
@@ -1249,7 +1256,7 @@
                     <!-- Duplicated for seamless infinite scroll -->
                     <div class="testimonial">
                         <p class="testimonial-text">"Both concepts looked great. Amazing turnaround on a last-minute request. Made us look polished when we needed it most."</p>
-                        <p class="testimonial-author">Jay Begun</p>
+                        <p class="testimonial-author">Jay</p>
                         <p class="testimonial-role">Motzen Shabbos</p>
                     </div>
                     <div class="testimonial">
@@ -1259,7 +1266,7 @@
                     </div>
                     <div class="testimonial">
                         <p class="testimonial-text">"We really appreciate the wonderful job on our annual calendars. Professional, easy to work with, and always delivers on time."</p>
-                        <p class="testimonial-author">Golda Goldberg</p>
+                        <p class="testimonial-author">Golda</p>
                         <p class="testimonial-role">Community Outreach</p>
                     </div>
                     <div class="testimonial">
