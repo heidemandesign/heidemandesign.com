@@ -278,21 +278,12 @@
             to { transform: translate(-50%, -50%) rotate(360deg); }
         }
 
-        .orbit-track {
-            contain: layout style paint;
-            will-change: transform;
-            transform: translateZ(0);
-            backface-visibility: hidden;
-        }
-
         .orbit-dot {
             position: absolute;
             width: 6px; height: 6px;
             background: var(--accent);
             border-radius: 50%;
             animation: dotGlow 2s ease-in-out infinite;
-            will-change: opacity, box-shadow;
-            contain: layout style;
         }
         @keyframes dotGlow {
             0%, 100% { opacity: 0.7; box-shadow: 0 0 8px var(--accent-glow), 0 0 16px var(--accent-glow); }
@@ -375,55 +366,30 @@
             padding: 80px clamp(32px, 5vw, 80px);
             position: relative;
             pointer-events: none;
+            transform: translateY(100vh);
+            opacity: 0;
+            transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease;
         }
 
-        /* Modal scroll-reveal state */
-        .modal-overlay.scroll-reveal {
+        .modal-overlay.active {
             opacity: 1;
             visibility: visible;
-            background: rgba(10, 14, 20, 0);
-            backdrop-filter: blur(0px);
-            -webkit-backdrop-filter: blur(0px);
-            pointer-events: none;
-            transition: none;
-        }
-        .modal-overlay.scroll-reveal .modal-content {
-            transform: translateY(var(--modal-y, 100%));
-            opacity: var(--modal-opacity, 0);
-            transition: none;
-        }
-        .modal-overlay.scroll-reveal .modal-close {
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        /* Fully open modal state */
-        .modal-overlay.active {
             background: rgba(10, 14, 20, 0.75);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            pointer-events: auto;
-            transition: background 0.3s ease, backdrop-filter 0.3s ease;
+            transition: background 0.5s ease, backdrop-filter 0.5s ease, opacity 0.3s ease;
         }
         .modal-overlay.active .modal-content {
             transform: translateY(0);
             opacity: 1;
-            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
-        }
-        .modal-overlay.active .modal-close {
-            opacity: 1;
-            transition: opacity 0.3s ease 0.2s;
         }
 
-        /* Hidden modal state */
-        .modal-overlay:not(.active):not(.scroll-reveal) {
+        .modal-overlay:not(.active) {
             opacity: 0;
             visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-        }
-        .modal-overlay:not(.active):not(.scroll-reveal) .modal-content {
-            transform: translateY(60px);
-            opacity: 0;
+            background: rgba(10, 14, 20, 0);
+            backdrop-filter: blur(0);
+            transition: opacity 0.4s ease, visibility 0.4s ease, background 0.4s ease;
         }
         .modal-content .service-item,
         .modal-content .bento-item,
@@ -1391,10 +1357,9 @@
         }
         function closeModal() {
             document.getElementById('modal').classList.remove('active');
-            document.getElementById('modal').classList.remove('scroll-reveal');
             document.body.style.overflow = '';
-            scrollProgress = 0;
-            isScrollRevealing = false;
+            // Reset scroll trigger after a delay so user can scroll to open again
+            setTimeout(() => { scrollTriggered = false; }, 500);
         }
         document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
 
@@ -1680,125 +1645,36 @@
         // Cycle labels periodically
         setInterval(cycleLabels, 3500);
 
-        // Interactive scroll-to-reveal modal
-        const modal = document.getElementById('modal');
-        let scrollProgress = 0;
-        const scrollThreshold = 300; // Total scroll needed to fully open
-        let isScrollRevealing = false;
-        let scrollTimeout = null;
+        // Simple scroll-to-open modal
+        let scrollTriggered = false;
 
-        function updateModalProgress() {
-            const progress = Math.min(1, scrollProgress / scrollThreshold);
-
-            if (progress > 0 && progress < 1) {
-                // In progress - show partial modal
-                if (!isScrollRevealing) {
-                    modal.classList.add('scroll-reveal');
-                    modal.classList.remove('active');
-                    isScrollRevealing = true;
-                }
-
-                const yOffset = 100 - (progress * 100); // 100% to 0%
-                const opacity = progress;
-                const bgOpacity = progress * 0.75;
-                const blur = progress * 12;
-
-                modal.style.setProperty('--modal-y', yOffset + '%');
-                modal.style.setProperty('--modal-opacity', opacity);
-                modal.style.background = `rgba(10, 14, 20, ${bgOpacity})`;
-                modal.style.backdropFilter = `blur(${blur}px)`;
-                modal.style.webkitBackdropFilter = `blur(${blur}px)`;
-            } else if (progress >= 1) {
-                // Fully open
-                modal.classList.remove('scroll-reveal');
-                modal.classList.add('active');
-                modal.style.removeProperty('--modal-y');
-                modal.style.removeProperty('--modal-opacity');
-                modal.style.background = '';
-                modal.style.backdropFilter = '';
-                modal.style.webkitBackdropFilter = '';
-                isScrollRevealing = false;
-                scrollProgress = 0; // Reset for next time
-                document.body.style.overflow = 'hidden';
-            } else {
-                // Closed
-                modal.classList.remove('scroll-reveal');
-                modal.classList.remove('active');
-                modal.style.removeProperty('--modal-y');
-                modal.style.removeProperty('--modal-opacity');
-                modal.style.background = '';
-                modal.style.backdropFilter = '';
-                modal.style.webkitBackdropFilter = '';
-                isScrollRevealing = false;
-            }
-        }
-
-        // Listen for wheel events on the page when modal is not fully open
         document.addEventListener('wheel', (e) => {
-            // Only handle if modal is not fully active
-            if (modal.classList.contains('active')) return;
+            if (scrollTriggered || modal.classList.contains('active')) return;
 
-            // Only trigger on scroll down
-            if (e.deltaY > 0) {
-                scrollProgress += e.deltaY * 0.5;
-                updateModalProgress();
-
-                // Clear any pending reset
-                if (scrollTimeout) clearTimeout(scrollTimeout);
-
-                // If user stops scrolling mid-reveal, slowly snap back or forward
-                scrollTimeout = setTimeout(() => {
-                    const progress = scrollProgress / scrollThreshold;
-                    if (progress > 0.4) {
-                        // Snap to fully open
-                        scrollProgress = scrollThreshold;
-                        updateModalProgress();
-                    } else {
-                        // Snap back to closed
-                        scrollProgress = 0;
-                        updateModalProgress();
-                    }
-                }, 200);
-            } else if (e.deltaY < 0 && isScrollRevealing) {
-                // Allow scrolling back up to close during reveal
-                scrollProgress = Math.max(0, scrollProgress + e.deltaY * 0.5);
-                updateModalProgress();
+            // Scroll down triggers modal
+            if (e.deltaY > 50) {
+                scrollTriggered = true;
+                openModal();
             }
         }, { passive: true });
 
-        // Touch support for mobile
+        // Touch support - swipe up opens modal
         let touchStartY = 0;
-        let lastTouchY = 0;
-
         document.addEventListener('touchstart', (e) => {
             if (modal.classList.contains('active')) return;
             touchStartY = e.touches[0].clientY;
-            lastTouchY = touchStartY;
         }, { passive: true });
 
-        document.addEventListener('touchmove', (e) => {
-            if (modal.classList.contains('active')) return;
+        document.addEventListener('touchend', (e) => {
+            if (scrollTriggered || modal.classList.contains('active')) return;
+            const touchEndY = e.changedTouches[0].clientY;
+            const deltaY = touchStartY - touchEndY;
 
-            const currentY = e.touches[0].clientY;
-            const deltaY = lastTouchY - currentY; // Positive when swiping up
-            lastTouchY = currentY;
-
-            if (deltaY > 0 || isScrollRevealing) {
-                scrollProgress = Math.max(0, scrollProgress + deltaY * 1.5);
-                updateModalProgress();
+            // Swipe up (50px threshold)
+            if (deltaY > 50) {
+                scrollTriggered = true;
+                openModal();
             }
-        }, { passive: true });
-
-        document.addEventListener('touchend', () => {
-            if (!isScrollRevealing) return;
-
-            const progress = scrollProgress / scrollThreshold;
-            if (progress > 0.4) {
-                scrollProgress = scrollThreshold;
-            } else {
-                scrollProgress = 0;
-            }
-            updateModalProgress();
         }, { passive: true });
 
     </script>
