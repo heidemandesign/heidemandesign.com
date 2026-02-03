@@ -99,6 +99,18 @@
             transition: opacity 0.3s ease;
         }
         .status:hover { opacity: 0.8; }
+        .version {
+            font-size: 0.55rem;
+            font-weight: 500;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .header:hover .version {
+            opacity: 0.5;
+        }
         .status-dot {
             width: 6px; height: 6px;
             background: var(--accent);
@@ -132,22 +144,6 @@
             gap: 14px;
             margin-bottom: clamp(32px, 4vh, 52px);
             margin-top: -20px;
-            position: relative;
-        }
-        .version {
-            position: absolute;
-            top: -16px;
-            left: 0;
-            font-size: 0.5rem;
-            font-weight: 500;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        .brand:hover .version {
-            opacity: 0.5;
         }
         .brand-logo {
             width: 48px;
@@ -1106,7 +1102,7 @@
     <div class="ambient-glow glow-2"></div>
 
     <header class="header">
-        <div></div>
+        <span class="version">v1.2</span>
         <a href="mailto:moshe@heidemandesign.com" class="status">
             <span class="status-dot"></span>
             <span>Available for select projects</span>
@@ -1116,7 +1112,6 @@
     <section class="hero">
         <div class="content">
             <div class="brand">
-                <span class="version">v1.1</span>
                 <svg class="brand-logo" viewBox="0 0 216 172.8"><path d="M120.75,112.42c0-16.13-6.28-31.29-17.68-42.69-11.4-11.4-26.57-17.68-42.69-17.68-12.67,0-24.75,3.88-34.87,11.08V25.5C25.5,11.42,14.08,0,0,0v147.3c0,14.08,11.42,25.5,25.5,25.5h0v-60.04c0-19.28,15.5-35.16,34.78-35.21,19.28-.05,34.97,15.61,34.97,34.87,0,16.13,6.28,31.29,17.68,42.69,11.4,11.4,26.56,17.68,42.69,17.68s31.29-6.28,42.69-17.68c11.4-11.4,17.68-26.57,17.68-42.69V0c-14.08,0-25.5,8.42-25.5,22.5v40.62c-10.13-7.2-22.2-11.08-34.87-11.08s-25.62,4.19-35.98,11.89c4.63,5.65,8.41,11.9,11.27,18.67.53,1.26,1.02,2.52,1.49,3.8,6.39-5.71,14.64-8.86,23.22-8.86,19.32,0,35.02,15.79,34.87,35.15-.15,18.97-15.63,34.46-34.6,34.6-19.35.15-35.15-15.55-35.15-34.87Z"/></svg>
                 <span class="brand-name">
                     <span>Heideman</span>
