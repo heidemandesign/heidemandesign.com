@@ -368,6 +368,41 @@
             pointer-events: auto;
         }
 
+        /* Scroll reveal animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .reveal-stagger { transition-delay: calc(var(--i, 0) * 0.08s); }
+
+        /* Homepage entrance animations */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .hero .brand { animation: fadeUp 0.8s ease-out 0.2s both; }
+        .hero .eyebrow { animation: fadeUp 0.8s ease-out 0.35s both; }
+        .hero .tagline { animation: fadeUp 0.8s ease-out 0.5s both; }
+        .hero .description { animation: fadeUp 0.8s ease-out 0.65s both; }
+        .hero .credentials { animation: fadeUp 0.8s ease-out 0.8s both; }
+        .hero .cta-group { animation: fadeUp 0.8s ease-out 0.95s both; }
+        .orbit-container { animation: scaleIn 1s ease-out 0.4s both; }
+        .orbit-ring { animation: fadeIn 1.2s ease-out 0.6s both; }
+        .header { animation: fadeIn 0.8s ease-out 1s both; }
+
         .modal-close {
             position: fixed;
             top: 24px;
@@ -1300,6 +1335,32 @@
             el.addEventListener('click', (e) => e.stopPropagation());
         });
 
+        // Scroll reveal animations
+        const revealElements = () => {
+            document.querySelectorAll('.service-item').forEach((el, i) => {
+                el.classList.add('reveal', 'reveal-stagger');
+                el.style.setProperty('--i', i);
+            });
+            document.querySelectorAll('.bento-item').forEach((el, i) => {
+                el.classList.add('reveal', 'reveal-stagger');
+                el.style.setProperty('--i', i);
+            });
+            document.querySelectorAll('.section-header').forEach(el => {
+                el.classList.add('reveal');
+            });
+        };
+        revealElements();
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1, root: document.getElementById('modal') });
+
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
         // Services data - ordered: main services first, niche later
         // Colors: blue, amber, rose, cyan, violet (no green - reserved for dots)
         const services = [
@@ -1550,6 +1611,26 @@
 
         // Cycle labels periodically
         setInterval(cycleLabels, 3500);
+
+        // Homepage parallax on scroll (mobile)
+        const hero = document.querySelector('.hero');
+        const orbitContainer = document.querySelector('.orbit-container');
+        const content = document.querySelector('.content');
+
+        window.addEventListener('scroll', () => {
+            const scrollY = window.scrollY;
+            const maxScroll = window.innerHeight * 0.5;
+            const progress = Math.min(scrollY / maxScroll, 1);
+
+            if (orbitContainer) {
+                orbitContainer.style.transform = `translateY(${scrollY * 0.15}px) scale(${1 - progress * 0.1})`;
+                orbitContainer.style.opacity = 1 - progress * 0.5;
+            }
+            if (content) {
+                content.style.transform = `translateY(${scrollY * 0.05}px)`;
+                content.style.opacity = 1 - progress * 0.3;
+            }
+        }, { passive: true });
     </script>
 </body>
 </html>
