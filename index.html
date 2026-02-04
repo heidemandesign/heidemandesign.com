@@ -1054,7 +1054,7 @@
                 padding: 16px 24px;
             }
             .status {
-                font-size: 0.45rem;
+                font-size: 0.5rem;
                 gap: 6px;
             }
             .status-dot {
@@ -1063,61 +1063,79 @@
             }
             .hero {
                 height: 100vh;
-                padding: 80px 24px 40px;
+                padding: 70px 24px 40px;
                 grid-template-columns: 1fr;
                 display: flex;
                 flex-direction: column;
                 justify-content: center;
                 gap: 0;
+                position: relative;
             }
-            .content { text-align: center; }
-            /* Hide orbital on mobile entirely */
-            .visual { display: none; }
+            .content { text-align: center; z-index: 2; }
+            /* Orbital as faint background at bottom */
+            .visual {
+                position: absolute;
+                bottom: -15%;
+                left: 50%;
+                transform: translateX(-50%);
+                opacity: 0.12;
+                pointer-events: none;
+                z-index: 1;
+            }
+            .orbit-container {
+                max-width: 320px;
+            }
+            .orbit-label {
+                display: none;
+            }
             .brand {
-                flex-direction: row;
-                gap: 10px;
-                margin-bottom: 24px;
+                flex-direction: column;
+                gap: 12px;
+                margin-bottom: 20px;
                 justify-content: center;
+                align-items: center;
             }
-            .brand-logo { width: 36px; }
+            .brand-logo { width: 72px; }
             .brand-name {
-                text-align: left;
-                font-size: 0.85rem;
+                text-align: center;
+                font-size: 1rem;
             }
             .eyebrow {
-                font-size: 0.5rem;
-                margin-bottom: 10px;
+                font-size: 0.55rem;
+                margin-bottom: 12px;
             }
             .tagline {
-                font-size: 1.9rem;
-                margin-bottom: 16px;
+                font-size: 2.1rem;
+                margin-bottom: 18px;
                 line-height: 1.1;
             }
             .description {
-                font-size: 0.8rem;
-                margin-bottom: 24px;
-                max-width: 320px;
+                font-size: 0.85rem;
+                margin-bottom: 28px;
+                max-width: 340px;
                 margin-left: auto;
                 margin-right: auto;
+                line-height: 1.6;
             }
             .credentials {
                 flex-wrap: wrap;
-                gap: 20px;
+                gap: 24px;
                 justify-content: center;
-                margin-bottom: 28px;
-                padding-top: 16px;
+                margin-bottom: 32px;
+                padding-top: 18px;
             }
-            .credential-value { font-size: 1.1rem; }
-            .credential-label { font-size: 0.45rem; }
+            .credential-value { font-size: 1.25rem; }
+            .credential-label { font-size: 0.5rem; }
             .cta-group {
                 flex-direction: column;
-                gap: 10px;
+                gap: 12px;
                 align-items: center;
             }
             .cta-primary, .cta-secondary {
                 width: 100%;
-                max-width: 240px;
+                max-width: 260px;
                 justify-content: center;
+                padding: 14px 24px;
             }
             /* Services 2-wide on mobile */
             .services-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
@@ -1136,7 +1154,7 @@
     <div class="ambient-glow glow-2"></div>
 
     <header class="header">
-        <span class="version" id="version">v1.6</span>
+        <span class="version" id="version">v1.7</span>
         <a href="mailto:moshe@heidemandesign.com" class="status">
             <span class="status-dot"></span>
             <span>Available for select projects</span>
@@ -1154,7 +1172,7 @@
             </div>
 
             <p class="eyebrow">Visual Identity & Brand Strategy</p>
-            <h1 class="tagline">A decade building<br>better brands.</h1>
+            <h1 class="tagline">Building better brands<br>for over a decade.</h1>
             <p class="description">
                 Boutique creative studio turning good businesses into better brands with sharp design and market strategy built different.
             </p>
